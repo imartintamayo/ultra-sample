@@ -3,9 +3,11 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GamesController } from './games/games.controller';
 import { GamesService } from './games/games.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { environment } from '../config/environment';
 
 @Module({
-  imports: [],
+  imports: [MongooseModule.forRoot(environment.mongoConnect)],
   controllers: [AppController, GamesController],
   providers: [AppService, GamesService],
 })
