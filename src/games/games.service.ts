@@ -1,40 +1,95 @@
+import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
-
+import { InjectModel } from '@nestjs/mongoose';
+import { Game, GameDocument } from '../../schemas/game.schema';
+import { Publisher, PublisherDocument } from '../../schemas/publisher.schema';
+import { CreateGameDto } from '../../dto/game.dto';
+const ONE_HUNDRED = 100;
 @Injectable()
 export class GamesService {
-  getGames() {
-    return ['game'];
+  constructor(
+    @InjectModel(Game.name) private gameModel: Model<GameDocument>,
+    @InjectModel(Publisher.name)
+    private publisherModel: Model<PublisherDocument>,
+  ) {}
+
+  getGames(): Promise<Game[]> {
+    return this.gameModel.find().populate('publisher').exec();
   }
 
   getGame(gameId: string) {
-    return `game${gameId}`;
+    return this.gameModel.findById(gameId).populate('publisher').exec();
   }
 
-  getPublisher(gameId: string) {
-    return `publishergame${gameId}`;
+  async getPublisher(gameId: string) {
+    const game = await this.gameModel
+      .findById(gameId, { publisher: 1, _id: 0 })
+      .populate('publisher')
+      .exec();
+    return game.publisher;
   }
 
-  createGame(game) {
-    return `newGame + ${JSON.stringify(game, undefined, 2)}`;
+  async createGame(game: CreateGameDto): Promise<Game> {
+    const publisherInfo = game.publisher;
+    let publisher = await this.publisherModel.findOne({
+      siret: publisherInfo.siret,
+    });
+
+    if (!publisher) {
+      publisher = new this.publisherModel(publisherInfo);
+      await publisher.save();
+    }
+
+    const createdGame = new this.gameModel({
+      ...game,
+      publisher: publisher._id,
+    });
+    return createdGame.save();
   }
 
   updateGame(gameId: string, game) {
-    return `Updated game ${gameId} + ${JSON.stringify(game, undefined, 2)}`;
+    return this.gameModel.findOneAndUpdate(
+      {
+        _id: gameId,
+      },
+      game,
+    );
   }
 
   applyDiscountToGamesHavingAReleaseDateBetween(
-    discount: string,
-    releaseDate1: string,
-    releaseDate2: string,
+    discountPercent: number,
+    startDate: string,
+    endDate: string,
   ) {
-    return `apply-discount/${discount}/to-games-having-a-release-date-between/${releaseDate1}/and/${releaseDate2}`;
+    const discount = (ONE_HUNDRED - discountPercent) / ONE_HUNDRED;
+    return this.gameModel
+      .updateMany(
+        {
+          releaseDate: {
+            $gte: new Date(startDate),
+            $lte: new Date(endDate),
+          },
+        },
+        {
+          $mul: {
+            price: discount,
+          },
+        },
+      )
+      .exec();
   }
 
-  deleteGame(gameId: string) {
-    return `Deleted game${gameId}`;
+  async deleteGame(gameId: string) {
+    return await this.gameModel.deleteOne({
+      _id: gameId,
+    });
   }
 
   deleteGamesWithReleaseDateOlderThan(releaseDate: string) {
-    return `remove-games-with-release-date-older-than/${releaseDate}`;
+    return this.gameModel
+      .deleteMany({
+        releaseDate: new Date(releaseDate),
+      })
+      .exec();
   }
 }

@@ -38,17 +38,17 @@ export class GamesController {
   }
 
   @Put(
-    'apply-discount/:discount/to-games-having-a-release-date-between/:releaseDate1/and/:releaseDate2',
+    'apply-discount/:discountPercent/to-games-having-a-release-date-between/:startDate/and/:endDate',
   )
   applyDiscountToGamesHavingAReleaseDateBetween(
-    @Param('discount') discount: string,
-    @Param('releaseDate1') releaseDate1: string,
-    @Param('releaseDate2') releaseDate2: string,
+    @Param('discountPercent') discountPercent: string,
+    @Param('startDate') startDate: string,
+    @Param('endDate') endDate: string,
   ) {
     return this.gamesService.applyDiscountToGamesHavingAReleaseDateBetween(
-      discount,
-      releaseDate1,
-      releaseDate2,
+      Number.parseInt(discountPercent, 10),
+      startDate,
+      endDate,
     );
   }
 
