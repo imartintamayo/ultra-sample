@@ -3,7 +3,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Game, GameDocument } from '../../schemas/game.schema';
 import { Publisher, PublisherDocument } from '../../schemas/publisher.schema';
-import { CreateGameDto } from '../../dto/game.dto';
+import { CreateGameDto, UpdateGameDto } from '../../dto/game.dto';
+import { Game as GameEntity } from '../../entities/game.entity';
+import { Publisher as PublisherEntity } from '../../entities/publisher.entity';
 const ONE_HUNDRED = 100;
 @Injectable()
 export class GamesService {
@@ -13,15 +15,20 @@ export class GamesService {
     private publisherModel: Model<PublisherDocument>,
   ) {}
 
-  getGames(): Promise<Game[]> {
-    return this.gameModel.find().populate('publisher').exec();
+  async getGames(): Promise<GameEntity[]> {
+    const games = await this.gameModel.find().populate('publisher').exec();
+    return games.map((game) => new GameEntity(game));
   }
 
-  getGame(gameId: string) {
-    return this.gameModel.findById(gameId).populate('publisher').exec();
+  async getGame(gameId: string): Promise<GameEntity> {
+    const game = await this.gameModel
+      .findById(gameId)
+      .populate('publisher')
+      .exec();
+    return new GameEntity(game);
   }
 
-  async getPublisher(gameId: string) {
+  async getPublisher(gameId: string): Promise<PublisherEntity> {
     const game = await this.gameModel
       .findById(gameId, { publisher: 1, _id: 0 })
       .populate('publisher')
@@ -29,9 +36,9 @@ export class GamesService {
     return game.publisher;
   }
 
-  async createGame(game: CreateGameDto): Promise<Game> {
-    const siret = game.publisher;
-    let publisher = await this.publisherModel.findOne({
+  async createGame(createGameDto: CreateGameDto): Promise<GameEntity> {
+    const siret = createGameDto.publisher;
+    const publisher = await this.publisherModel.findOne({
       siret,
     });
 
@@ -40,19 +47,66 @@ export class GamesService {
     }
 
     const createdGame = new this.gameModel({
-      ...game,
+      ...createGameDto,
       publisher: publisher._id,
     });
-    return createdGame.save();
+    const game = await createdGame.save();
+    return new GameEntity(game);
   }
 
-  updateGame(gameId: string, game) {
-    return this.gameModel.findOneAndUpdate(
+  async updateGame(
+    gameId: string,
+    updateGameDto: UpdateGameDto,
+  ): Promise<GameEntity> {
+    let game = await this.gameModel.findOne({
+      _id: gameId,
+    });
+
+    if (!game) {
+      throw new Error(`Game not found with gameId: ${gameId}`);
+    }
+
+    const siret = updateGameDto.publisher;
+    const publisher = await this.publisherModel.findOne({
+      siret,
+    });
+
+    const result = await this.gameModel.updateOne(
       {
         _id: gameId,
       },
-      game,
+      {
+        $set: { ...updateGameDto, publisher: publisher._id },
+      },
     );
+
+    console.log('>>>>>>>>', result);
+
+    game = await this.gameModel.findOne({
+      _id: gameId,
+    });
+
+    return new GameEntity(game);
+  }
+
+  async deleteGame(gameId: string): Promise<GameEntity> {
+    const game = await this.gameModel.findOne({
+      _id: gameId,
+    });
+
+    if (!game) {
+      throw new Error(`Game not found with gameId: ${gameId}`);
+    }
+
+    return new GameEntity(game);
+  }
+
+  deleteGamesWithReleaseDateOlderThan(releaseDate: string) {
+    return this.gameModel
+      .deleteMany({
+        releaseDate: new Date(releaseDate),
+      })
+      .exec();
   }
 
   applyDiscountToGamesHavingAReleaseDateBetween(
@@ -75,20 +129,6 @@ export class GamesService {
           },
         },
       )
-      .exec();
-  }
-
-  async deleteGame(gameId: string) {
-    return await this.gameModel.deleteOne({
-      _id: gameId,
-    });
-  }
-
-  deleteGamesWithReleaseDateOlderThan(releaseDate: string) {
-    return this.gameModel
-      .deleteMany({
-        releaseDate: new Date(releaseDate),
-      })
       .exec();
   }
 }
