@@ -12,7 +12,6 @@ async function bootstrap() {
     .setTitle('ULTRA sample API')
     .setDescription('The ULTRA sample API description')
     .setVersion('1.0')
-    .addTag('ULTRA API')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

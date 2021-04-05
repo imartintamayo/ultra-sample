@@ -10,7 +10,7 @@ import {
 import { GamesService } from './games.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateGameDto } from '../../dto/game.dto';
-@ApiTags('ULTRA API')
+@ApiTags('GAMES')
 @Controller('games')
 export class GamesController {
   constructor(private gamesService: GamesService) {}
