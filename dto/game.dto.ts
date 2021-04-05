@@ -1,13 +1,19 @@
-class PublisherDto {
-    name: string;
-    phone: string;
-    siret: number;
-}
-
+import { IsArray, IsDateString, IsNotEmpty, IsNumber, IsString, Min } from 'class-validator';
 export class CreateGameDto {
+    @IsString()
+    @IsNotEmpty()
     title: string;
+    
+    @IsNumber()
+    @Min(0)
     price: number;
+
+    @IsDateString()
     releaseDate: Date;
-    tags: string[] = [];
-    publisher: PublisherDto;
+
+    @IsArray()
+    tags?: string[] = [];
+
+    @IsNumber()
+    publisher: number;
 }

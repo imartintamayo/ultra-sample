@@ -30,14 +30,13 @@ export class GamesService {
   }
 
   async createGame(game: CreateGameDto): Promise<Game> {
-    const publisherInfo = game.publisher;
+    const siret = game.publisher;
     let publisher = await this.publisherModel.findOne({
-      siret: publisherInfo.siret,
+      siret,
     });
 
     if (!publisher) {
-      publisher = new this.publisherModel(publisherInfo);
-      await publisher.save();
+      throw new Error('Publisher not found');
     }
 
     const createdGame = new this.gameModel({
