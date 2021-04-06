@@ -82,25 +82,8 @@ export class GamesController {
     return this.gamesService.deleteGame(gameId);
   }
 
-  @Delete('remove-games-with-release-date-older-than/:releaseDate')
-  deleteGamesWithReleaseDateOlderThan(
-    @Param('releaseDate') releaseDate: string,
-  ) {
-    return this.gamesService.deleteGamesWithReleaseDateOlderThan(releaseDate);
-  }
-
-  @Put(
-    'apply-discount/:discountPercent/to-games-having-a-release-date-between/:startDate/and/:endDate',
-  )
-  applyDiscountToGamesHavingAReleaseDateBetween(
-    @Param('discountPercent') discountPercent: string,
-    @Param('startDate') startDate: string,
-    @Param('endDate') endDate: string,
-  ) {
-    return this.gamesService.applyDiscountToGamesHavingAReleaseDateBetween(
-      Number.parseInt(discountPercent, 10),
-      startDate,
-      endDate,
-    );
+  @Post('trigger-apply-discount-and-delete-older-games-process')
+  triggerApplyDiscountAndDeleteOlderGamesProcess() {
+    return this.gamesService.triggerApplyDiscountAndDeleteOlderGamesProcess();
   }
 }

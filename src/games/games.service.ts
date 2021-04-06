@@ -6,7 +6,8 @@ import { Publisher, PublisherDocument } from '../../schemas/publisher.schema';
 import { CreateGameDto, UpdateGameDto } from '../../dto/game.dto';
 import { Game as GameEntity } from '../../entities/game.entity';
 import { Publisher as PublisherEntity } from '../../entities/publisher.entity';
-const ONE_HUNDRED = 100;
+import { applyDiscountAndDeleteOlderGamesProcess } from '../utils/apply-discount-and-delete-older-games-process-execute';
+
 @Injectable()
 export class GamesService {
   constructor(
@@ -33,7 +34,7 @@ export class GamesService {
       .findById(gameId, { publisher: 1, _id: 0 })
       .populate('publisher')
       .exec();
-    return game.publisher;
+    return new PublisherEntity(game.publisher);
   }
 
   async createGame(createGameDto: CreateGameDto): Promise<GameEntity> {
@@ -101,34 +102,7 @@ export class GamesService {
     return new GameEntity(game);
   }
 
-  deleteGamesWithReleaseDateOlderThan(releaseDate: string) {
-    return this.gameModel
-      .deleteMany({
-        releaseDate: new Date(releaseDate),
-      })
-      .exec();
-  }
-
-  applyDiscountToGamesHavingAReleaseDateBetween(
-    discountPercent: number,
-    startDate: string,
-    endDate: string,
-  ) {
-    const discount = (ONE_HUNDRED - discountPercent) / ONE_HUNDRED;
-    return this.gameModel
-      .updateMany(
-        {
-          releaseDate: {
-            $gte: new Date(startDate),
-            $lte: new Date(endDate),
-          },
-        },
-        {
-          $mul: {
-            price: discount,
-          },
-        },
-      )
-      .exec();
+  triggerApplyDiscountAndDeleteOlderGamesProcess() {
+    return applyDiscountAndDeleteOlderGamesProcess(this.gameModel);
   }
 }
