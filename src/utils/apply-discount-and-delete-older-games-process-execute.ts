@@ -1,4 +1,4 @@
-import { ApplyDiscountAndDeleteOlderGames } from '../../entities/apply-discount-and-delete-older-games.entity';
+import { ApplyDiscountAndDeleteOlderGames } from '../entities/apply-discount-and-delete-older-games.entity';
 
 const substracMonths = (date: Date, months: number) => {
   const nDate = new Date(date);

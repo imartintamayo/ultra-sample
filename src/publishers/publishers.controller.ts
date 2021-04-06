@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { PublishersService } from './publishers.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreatePublisherDto } from '../../dto/publisher.dto';
+import { CreatePublisherDto } from '../dto/publisher.dto';
 
 @ApiTags('PUBLISHERS')
 @Controller('publishers')

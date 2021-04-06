@@ -1,12 +1,12 @@
 import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Game, GameDocument } from '../../schemas/game.schema';
-import { Publisher, PublisherDocument } from '../../schemas/publisher.schema';
-import { CreateGameDto, UpdateGameDto } from '../../dto/game.dto';
-import { Game as GameEntity } from '../../entities/game.entity';
-import { Publisher as PublisherEntity } from '../../entities/publisher.entity';
-import { ApplyDiscountAndDeleteOlderGames } from '../../entities/apply-discount-and-delete-older-games.entity';
+import { Game, GameDocument } from '../schemas/game.schema';
+import { Publisher, PublisherDocument } from '../schemas/publisher.schema';
+import { CreateGameDto, UpdateGameDto } from '../dto/game.dto';
+import { Game as GameEntity } from '../entities/game.entity';
+import { Publisher as PublisherEntity } from '../entities/publisher.entity';
+import { ApplyDiscountAndDeleteOlderGames } from '../entities/apply-discount-and-delete-older-games.entity';
 import { applyDiscountAndDeleteOlderGamesProcess } from '../utils/apply-discount-and-delete-older-games-process-execute';
 
 @Injectable()

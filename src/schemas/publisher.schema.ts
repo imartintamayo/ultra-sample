@@ -3,14 +3,14 @@ import { Document } from 'mongoose';
 
 @Schema()
 export class Publisher {
-    @Prop()
-    name: string;
+  @Prop()
+  name: string;
 
-    @Prop()
-    siret: number;
+  @Prop()
+  siret: number;
 
-    @Prop()
-    phone: string;
+  @Prop()
+  phone: string;
 }
 
 export type PublisherDocument = Publisher & Document;

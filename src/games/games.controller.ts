@@ -9,9 +9,9 @@ import {
 } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreateGameDto, UpdateGameDto } from '../../dto/game.dto';
-import { Game as GameEntity } from '../../entities/game.entity';
-import { Publisher as PublisherEntity } from '../../entities/publisher.entity';
+import { CreateGameDto, UpdateGameDto } from '../dto/game.dto';
+import { Game as GameEntity } from '../entities/game.entity';
+import { Publisher as PublisherEntity } from '../entities/publisher.entity';
 @ApiTags('GAMES')
 @Controller('games')
 export class GamesController {
