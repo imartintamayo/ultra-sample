@@ -1,8 +1,4 @@
-import { Model } from 'mongoose';
-import { GameDocument } from '../../schemas/game.schema';
-const DEFAULT_DISCOUNT = 20;
-const EIGHT_TEEN = 18;
-const TWELVE = 12;
+import { ApplyDiscountAndDeleteOlderGames } from '../../entities/apply-discount-and-delete-older-games.entity';
 
 const substracMonths = (date: Date, months: number) => {
   const nDate = new Date(date);
@@ -32,11 +28,15 @@ const getDiscountToApply = (discountPercent: number) => {
   return (100 - discountPercent) / 100;
 };
 
-const deleteGamesWithReleaseDateOlderThan = async (
-  gameModel: Model<GameDocument>,
-  releaseDate: Date,
-) => {
-  let date: Date = substracMonths(releaseDate, EIGHT_TEEN);
+const deleteGamesWithReleaseDateOlderThan = async ({
+  gameModel,
+  releaseDate,
+  applyToGamesWithReleaseDateMinusMonthsEnd,
+}: ApplyDiscountAndDeleteOlderGames) => {
+  let date: Date = substracMonths(
+    releaseDate,
+    applyToGamesWithReleaseDateMinusMonthsEnd,
+  );
   date = dateToStartOfDay(date);
 
   const gamesToDelete = await gameModel
@@ -45,6 +45,7 @@ const deleteGamesWithReleaseDateOlderThan = async (
         $lt: date,
       },
     })
+    .populate('publisher')
     .exec();
 
   const result = await gameModel
@@ -61,30 +62,38 @@ const deleteGamesWithReleaseDateOlderThan = async (
   };
 };
 
-const applyDiscountToGamesWithReleaseDateBetween = async (
-  gameModel: Model<GameDocument>,
-  releaseDate: Date,
-  discountPercent: number,
-) => {
-  let startDate: Date = substracMonths(releaseDate, EIGHT_TEEN);
+const applyDiscountToGamesWithReleaseDateBetween = async ({
+  gameModel,
+  releaseDate,
+  discountPercent,
+  applyToGamesWithReleaseDateMinusMonthsStart,
+  applyToGamesWithReleaseDateMinusMonthsEnd,
+}: ApplyDiscountAndDeleteOlderGames) => {
+  let startDate: Date = substracMonths(
+    releaseDate,
+    applyToGamesWithReleaseDateMinusMonthsEnd,
+  );
   startDate = dateToStartOfDay(startDate);
 
-  let endDate: Date = substracMonths(releaseDate, TWELVE);
+  let endDate: Date = substracMonths(
+    releaseDate,
+    applyToGamesWithReleaseDateMinusMonthsStart,
+  );
   endDate = dateToEndOfDay(endDate);
 
   const discount = getDiscountToApply(discountPercent);
 
-  const gamesBeforeUpdate = await gameModel;
-  gameModel
+  const gamesBeforeUpdate = await gameModel
     .find({
       releaseDate: {
         $gte: startDate,
         $lte: endDate,
       },
     })
+    .populate('publisher')
     .exec();
 
-  const result = gameModel
+  const result = await gameModel
     .updateMany(
       {
         releaseDate: {
@@ -100,14 +109,14 @@ const applyDiscountToGamesWithReleaseDateBetween = async (
     )
     .exec();
 
-  const gamesAfterUpdate = await gameModel;
-  gameModel
+  const gamesAfterUpdate = await gameModel
     .find({
       releaseDate: {
         $gte: startDate,
         $lte: endDate,
       },
     })
+    .populate('publisher')
     .exec();
 
   return {
@@ -118,18 +127,10 @@ const applyDiscountToGamesWithReleaseDateBetween = async (
 };
 
 export const applyDiscountAndDeleteOlderGamesProcess = async (
-  gameModel: Model<GameDocument>,
+  config: ApplyDiscountAndDeleteOlderGames,
 ) => {
-  const releaseDate = new Date();
-  const deletedGames = await deleteGamesWithReleaseDateOlderThan(
-    gameModel,
-    releaseDate,
-  );
-  const updatedGames = await applyDiscountToGamesWithReleaseDateBetween(
-    gameModel,
-    releaseDate,
-    DEFAULT_DISCOUNT,
-  );
+  const deletedGames = await deleteGamesWithReleaseDateOlderThan(config);
+  const updatedGames = await applyDiscountToGamesWithReleaseDateBetween(config);
 
   return {
     deletedGames,

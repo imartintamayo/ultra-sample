@@ -6,6 +6,7 @@ import { Publisher, PublisherDocument } from '../../schemas/publisher.schema';
 import { CreateGameDto, UpdateGameDto } from '../../dto/game.dto';
 import { Game as GameEntity } from '../../entities/game.entity';
 import { Publisher as PublisherEntity } from '../../entities/publisher.entity';
+import { ApplyDiscountAndDeleteOlderGames } from '../../entities/apply-discount-and-delete-older-games.entity';
 import { applyDiscountAndDeleteOlderGamesProcess } from '../utils/apply-discount-and-delete-older-games-process-execute';
 
 @Injectable()
@@ -72,7 +73,7 @@ export class GamesService {
       siret,
     });
 
-    const result = await this.gameModel.updateOne(
+    await this.gameModel.updateOne(
       {
         _id: gameId,
       },
@@ -80,8 +81,6 @@ export class GamesService {
         $set: { ...updateGameDto, publisher: publisher._id },
       },
     );
-
-    console.log('>>>>>>>>', result);
 
     game = await this.gameModel.findOne({
       _id: gameId,
@@ -103,6 +102,13 @@ export class GamesService {
   }
 
   triggerApplyDiscountAndDeleteOlderGamesProcess() {
-    return applyDiscountAndDeleteOlderGamesProcess(this.gameModel);
+    const config: ApplyDiscountAndDeleteOlderGames = {
+      gameModel: this.gameModel,
+      releaseDate: new Date(),
+      discountPercent: 20,
+      applyToGamesWithReleaseDateMinusMonthsStart: 12,
+      applyToGamesWithReleaseDateMinusMonthsEnd: 18,
+    };
+    return applyDiscountAndDeleteOlderGamesProcess(config);
   }
 }
