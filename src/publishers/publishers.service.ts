@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Publisher, PublisherDocument } from '../schemas/publisher.schema';
 import { Publisher as PublisherEntity } from '../entities/publisher.entity';
 import { CreatePublisherDto } from '../dto/publisher.dto';
+import { PublisherConflictException } from '../errors/PublisherConflictException.error';
 
 @Injectable()
 export class PublishersService {
@@ -26,7 +27,7 @@ export class PublishersService {
     });
 
     if (publisher) {
-      throw new Error(`A Publisher with siret: ${siret} already exists`);
+      throw new PublisherConflictException(siret);
     }
 
     const createdPublisher = new this.publisherModel({

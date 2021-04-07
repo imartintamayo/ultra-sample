@@ -8,6 +8,8 @@ import { Game as GameEntity } from '../entities/game.entity';
 import { Publisher as PublisherEntity } from '../entities/publisher.entity';
 import { ApplyDiscountAndDeleteOlderGames } from '../entities/apply-discount-and-delete-older-games.entity';
 import { applyDiscountAndDeleteOlderGamesProcess } from '../utils/apply-discount-and-delete-older-games-process-execute';
+import { GameNotFoundException } from '../errors/GameNotFoundException.error';
+import { PublisherNotFoundException } from '../errors/PublisherNotFoundException.error';
 
 @Injectable()
 export class GamesService {
@@ -27,6 +29,11 @@ export class GamesService {
       .findById(gameId)
       .populate('publisher')
       .exec();
+
+    if (!game) {
+      throw new GameNotFoundException(gameId);
+    }
+
     return new GameEntity(game);
   }
 
@@ -37,7 +44,7 @@ export class GamesService {
       .exec();
 
     if (!game) {
-      throw new Error(`Game not found with gameId: ${gameId}`);
+      throw new GameNotFoundException(gameId);
     }
 
     return new PublisherEntity(game?.publisher);
@@ -50,7 +57,7 @@ export class GamesService {
     });
 
     if (!publisher) {
-      throw new Error('Publisher not found');
+      throw new PublisherNotFoundException(siret);
     }
 
     const createdGame = new this.gameModel({
@@ -70,13 +77,17 @@ export class GamesService {
     });
 
     if (!game) {
-      throw new Error(`Game not found with gameId: ${gameId}`);
+      throw new GameNotFoundException(gameId);
     }
 
     const { publisher: siret, ...dataToSet } = updateGameDto;
     const publisher = await this.publisherModel.findOne({
       siret,
     });
+
+    if (siret && !publisher) {
+      throw new PublisherNotFoundException(siret);
+    }
 
     if (publisher) {
       Object.assign(dataToSet, { publisher: publisher._id });
@@ -108,7 +119,7 @@ export class GamesService {
       .populate('publisher');
 
     if (!game) {
-      throw new Error(`Game not found with gameId: ${gameId}`);
+      throw new GameNotFoundException(gameId);
     }
 
     await this.gameModel
