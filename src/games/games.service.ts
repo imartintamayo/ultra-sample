@@ -111,6 +111,12 @@ export class GamesService {
       throw new Error(`Game not found with gameId: ${gameId}`);
     }
 
+    await this.gameModel
+      .deleteOne({
+        _id: gameId,
+      })
+      .exec();
+
     return new GameEntity(game);
   }
 
