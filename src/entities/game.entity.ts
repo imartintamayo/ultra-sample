@@ -1,16 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Publisher } from './publisher.entity';
 import { GameDocument } from '../schemas/game.schema';
+import { PublisherDocument } from '../schemas/publisher.schema';
 import { Publisher as PublisherEntity } from './publisher.entity';
 
 export class Game {
-  constructor(game?: GameDocument) {
+  constructor(game?: GameDocument, publisher?: PublisherDocument) {
     this.id = game?._id;
     this.title = game?.title;
     this.price = game?.price;
     this.releaseDate = game?.releaseDate;
     this.tags = game?.tags;
-    this.publisher = new PublisherEntity(game?.publisher);
+    this.publisher = new PublisherEntity(
+      publisher ? publisher : game?.publisher,
+    );
   }
 
   @ApiProperty({ example: 'someId', description: 'The id of the Game' })

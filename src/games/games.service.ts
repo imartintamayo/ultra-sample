@@ -58,7 +58,7 @@ export class GamesService {
       publisher: publisher._id,
     });
     const game = await createdGame.save();
-    return new GameEntity(game);
+    return new GameEntity(game, publisher);
   }
 
   async updateGame(
@@ -73,31 +73,39 @@ export class GamesService {
       throw new Error(`Game not found with gameId: ${gameId}`);
     }
 
-    const siret = updateGameDto.publisher;
+    const { publisher: siret, ...dataToSet } = updateGameDto;
     const publisher = await this.publisherModel.findOne({
       siret,
     });
+
+    if (publisher) {
+      Object.assign(dataToSet, { publisher: publisher._id });
+    }
 
     await this.gameModel.updateOne(
       {
         _id: gameId,
       },
       {
-        $set: { ...updateGameDto, publisher: publisher._id },
+        $set: dataToSet,
       },
     );
 
-    game = await this.gameModel.findOne({
-      _id: gameId,
-    });
+    game = await this.gameModel
+      .findOne({
+        _id: gameId,
+      })
+      .populate('publisher');
 
     return new GameEntity(game);
   }
 
   async deleteGame(gameId: string): Promise<GameEntity> {
-    const game = await this.gameModel.findOne({
-      _id: gameId,
-    });
+    const game = await this.gameModel
+      .findOne({
+        _id: gameId,
+      })
+      .populate('publisher');
 
     if (!game) {
       throw new Error(`Game not found with gameId: ${gameId}`);

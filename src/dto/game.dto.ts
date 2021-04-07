@@ -1,11 +1,10 @@
 import {
-  IsArray,
   IsDateString,
   IsNotEmpty,
-  IsNotEmptyObject,
   IsNumber,
   IsString,
   Min,
+  IsOptional,
 } from 'class-validator';
 export class CreateGameDto {
   @IsString()
@@ -29,22 +28,27 @@ export class CreateGameDto {
 }
 
 export class UpdateGameDto {
+  @IsOptional()
   @IsString()
   @IsNotEmpty()
   title?: string;
 
+  @IsOptional()
   @IsNumber()
   @Min(0)
   price?: number;
 
+  @IsOptional()
   @IsDateString()
   releaseDate?: Date;
 
+  @IsOptional()
   @IsString({
     each: true,
   })
-  tags?: string[] = [];
+  tags?: string[];
 
+  @IsOptional()
   @IsNumber()
   publisher?: number;
 }
