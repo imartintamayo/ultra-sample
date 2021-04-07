@@ -4,7 +4,9 @@ services:
   ultra-sample:
     container_name: ultra-sample
     restart: always
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
         - "3000:3000"
     links:
@@ -18,3 +20,7 @@ services:
         - "27017:27017"
     logging:
       driver: none
+    volumes:
+        - ultra-mongo-data:/data/db
+volumes:
+  ultra-mongo-data:

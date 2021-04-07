@@ -35,7 +35,12 @@ export class GamesService {
       .findById(gameId, { publisher: 1, _id: 0 })
       .populate('publisher')
       .exec();
-    return new PublisherEntity(game.publisher);
+
+    if (!game) {
+      throw new Error(`Game not found with gameId: ${gameId}`);
+    }
+
+    return new PublisherEntity(game?.publisher);
   }
 
   async createGame(createGameDto: CreateGameDto): Promise<GameEntity> {
