@@ -1,8 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Publisher } from './publisher.entity';
+import { Publisher } from '../../publishers/entities/publisher.entity';
 import { GameDocument } from '../schemas/game.schema';
-import { PublisherDocument } from '../schemas/publisher.schema';
-import { Publisher as PublisherEntity } from './publisher.entity';
+import { PublisherDocument } from '../../publishers/schemas/publisher.schema';
+import { Publisher as PublisherEntity } from '../../publishers/entities/publisher.entity';
 
 export class Game {
   constructor(game?: GameDocument, publisher?: PublisherDocument) {

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PublishersController } from './publishers.controller';
 import { PublishersService } from './publishers.service';
-import { Publisher, PublisherSchema } from '../schemas/publisher.schema';
+import { Publisher, PublisherSchema } from './schemas/publisher.schema';
 
 @Module({
   imports: [

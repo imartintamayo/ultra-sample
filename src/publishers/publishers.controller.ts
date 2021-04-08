@@ -1,8 +1,8 @@
 import { Controller, Get, Post, Body, HttpStatus } from '@nestjs/common';
 import { PublishersService } from './publishers.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { CreatePublisherDto } from '../dto/publisher.dto';
-import { Publisher as PublisherEntity } from '../entities/publisher.entity';
+import { CreatePublisherDto } from './dto/publisher.dto';
+import { Publisher as PublisherEntity } from './entities/publisher.entity';
 
 @ApiTags('PUBLISHERS')
 @Controller('publishers')

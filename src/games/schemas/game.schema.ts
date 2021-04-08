@@ -1,7 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Schema as MongooseSchema } from 'mongoose';
 import { Document } from 'mongoose';
-import { PublisherDocument, Publisher } from './publisher.schema';
+import {
+  PublisherDocument,
+  Publisher,
+} from '../../publishers/schemas/publisher.schema';
 
 @Schema()
 export class Game {

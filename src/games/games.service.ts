@@ -1,15 +1,15 @@
 import { Model, UpdateWriteOpResult } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Game, GameDocument } from '../schemas/game.schema';
-import { CreateGameDto, UpdateGameDto } from '../dto/game.dto';
-import { Game as GameEntity } from '../entities/game.entity';
-import { ApplyDiscountAndDeleteOlderGames } from '../entities/apply-discount-and-delete-older-games.entity';
+import { Game, GameDocument } from './schemas/game.schema';
+import { CreateGameDto, UpdateGameDto } from './dto/game.dto';
+import { Game as GameEntity } from './entities/game.entity';
+import { ApplyDiscountAndDeleteOlderGames } from './dto/apply-discount-and-delete-older-games.entity';
 import { applyDiscountAndDeleteOlderGamesProcess } from '../utils/apply-discount-and-delete-older-games-process-execute';
-import { GameNotFoundException } from '../errors/GameNotFoundException.error';
+import { GameNotFoundException } from './errors/GameNotFoundException.error';
 import { PublishersService } from '../publishers/publishers.service';
-import { Publisher as PublisherEntity } from '../entities/publisher.entity';
-import { PublisherNotFoundException } from '../errors/PublisherNotFoundException.error';
+import { Publisher as PublisherEntity } from '../publishers/entities/publisher.entity';
+import { PublisherNotFoundException } from '../publishers/errors/PublisherNotFoundException.error';
 
 @Injectable()
 export class GamesService {

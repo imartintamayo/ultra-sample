@@ -2,8 +2,11 @@ import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { GamesController } from './games.controller';
 import { GamesService } from './games.service';
-import { Game, GameSchema } from '../schemas/game.schema';
-import { Publisher, PublisherSchema } from '../schemas/publisher.schema';
+import { Game, GameSchema } from './schemas/game.schema';
+import {
+  Publisher,
+  PublisherSchema,
+} from '../publishers/schemas/publisher.schema';
 import { PublishersService } from '../publishers/publishers.service';
 
 @Module({
