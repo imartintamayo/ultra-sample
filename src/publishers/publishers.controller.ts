@@ -24,7 +24,7 @@ export class PublishersController {
     return this.publishersService.getPublishers();
   }
 
-  @Post()
+  @Post('/create')
   @ApiOperation({ summary: 'Create publisher' })
   @ApiResponse({
     status: HttpStatus.CREATED,

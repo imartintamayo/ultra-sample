@@ -65,7 +65,7 @@ export class GamesController {
     return this.gamesService.getGamePublisherByGameId(gameId);
   }
 
-  @Post()
+  @Post('/create')
   @ApiOperation({ summary: 'Create game' })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -81,7 +81,7 @@ export class GamesController {
     return this.gamesService.createGame(body);
   }
 
-  @Put(':gameId')
+  @Put(':gameId/update')
   @ApiOperation({ summary: 'Update game by gameId' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -100,7 +100,7 @@ export class GamesController {
     return this.gamesService.updateGameById(gameId, body);
   }
 
-  @Delete(':gameId')
+  @Delete(':gameId/delete')
   @ApiOperation({ summary: 'Delete game by gameId' })
   @ApiResponse({
     status: HttpStatus.OK,
