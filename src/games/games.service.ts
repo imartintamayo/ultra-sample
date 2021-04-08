@@ -1,10 +1,16 @@
-import { Model, UpdateWriteOpResult } from 'mongoose';
+import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Game, GameDocument } from './schemas/game.schema';
 import { CreateGameDto, UpdateGameDto } from './dto/game.dto';
 import { Game as GameEntity } from './entities/game.entity';
-import { ApplyDiscountAndDeleteOlderGames } from './dto/apply-discount-and-delete-older-games.entity';
+import {
+  ApplyDiscountAndDeleteOlderGamesConfig,
+  ApplyDiscountAndDeleteOlderGamesResult,
+  DeleteWriteOpResult,
+  UpdateWriteOpResult,
+} from '../types/types';
+import { ApplyDiscountAndDeleteOlderGames } from './entities/apply-discount-and-delete-older-games.entity';
 import { applyDiscountAndDeleteOlderGamesProcess } from '../utils/apply-discount-and-delete-older-games-process-execute';
 import { GameNotFoundException } from './errors/GameNotFoundException.error';
 import { PublishersService } from '../publishers/publishers.service';
@@ -47,7 +53,7 @@ export class GamesService {
       .exec();
   }
 
-  private _deleteGameById(gameId: string): Promise<any> {
+  private _deleteGameById(gameId: string): Promise<DeleteWriteOpResult> {
     return this.gameModel
       .deleteOne({
         _id: gameId,
@@ -133,14 +139,17 @@ export class GamesService {
     return new GameEntity(game);
   }
 
-  triggerApplyDiscountAndDeleteOlderGamesProcess() {
-    const config: ApplyDiscountAndDeleteOlderGames = {
+  async triggerApplyDiscountAndDeleteOlderGamesProcess() {
+    const config: ApplyDiscountAndDeleteOlderGamesConfig = {
       gameModel: this.gameModel,
       releaseDate: new Date(),
       discountPercent: 20,
       applyToGamesWithReleaseDateMinusMonthsStart: 12,
       applyToGamesWithReleaseDateMinusMonthsEnd: 18,
     };
-    return applyDiscountAndDeleteOlderGamesProcess(config);
+    const result: ApplyDiscountAndDeleteOlderGamesResult = await applyDiscountAndDeleteOlderGamesProcess(
+      config,
+    );
+    return result;
   }
 }

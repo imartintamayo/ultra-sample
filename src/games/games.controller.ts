@@ -117,6 +117,10 @@ export class GamesController {
   }
 
   @Post('trigger-apply-discount-and-delete-older-games-process')
+  @ApiOperation({
+    summary: `Trigger a process which will automatically remove the games having a release date older than 18 months
+              and apply a discount of 20% to all games having a release date between 12 and 18 months.`,
+  })
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'Success',
