@@ -14,8 +14,8 @@ export class Game {
   @Prop()
   releaseDate: Date;
 
-  @Prop([String])
-  tags: string[];
+  @Prop({ type: [String], default: [] })
+  tags?: string[];
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: Publisher.name })
   publisher: PublisherDocument;

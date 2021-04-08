@@ -5,6 +5,7 @@ import { Publisher, PublisherDocument } from '../schemas/publisher.schema';
 import { Publisher as PublisherEntity } from '../entities/publisher.entity';
 import { CreatePublisherDto } from '../dto/publisher.dto';
 import { PublisherConflictException } from '../errors/PublisherConflictException.error';
+import { PublisherNotFoundException } from '../errors/PublisherNotFoundException.error';
 
 @Injectable()
 export class PublishersService {
@@ -13,8 +14,25 @@ export class PublishersService {
     private publisherModel: Model<PublisherDocument>,
   ) {}
 
+  private _savePublisher(publisher: Publisher): Promise<PublisherDocument> {
+    const createdPublisher = new this.publisherModel(publisher);
+    return createdPublisher.save();
+  }
+
+  private _findPublishers(): Promise<PublisherDocument[]> {
+    return this.publisherModel.find().exec();
+  }
+
+  findPublisherBySiret(siret: number): Promise<PublisherDocument> {
+    return this.publisherModel
+      .findOne({
+        siret,
+      })
+      .exec();
+  }
+
   async getPublishers(): Promise<PublisherEntity[]> {
-    const publishers = await this.publisherModel.find().exec();
+    const publishers = await this._findPublishers();
     return publishers.map((publisher) => new PublisherEntity(publisher));
   }
 
@@ -22,19 +40,13 @@ export class PublishersService {
     publisherDto: CreatePublisherDto,
   ): Promise<PublisherEntity> {
     const siret = publisherDto.siret;
-    let publisher = await this.publisherModel.findOne({
-      siret,
-    });
+    let publisher = await this.findPublisherBySiret(siret);
 
     if (publisher) {
       throw new PublisherConflictException(siret);
     }
 
-    const createdPublisher = new this.publisherModel({
-      ...publisherDto,
-    });
-    await createdPublisher.save();
-
+    const createdPublisher = await this._savePublisher(publisherDto);
     return new PublisherEntity(createdPublisher);
   }
 }

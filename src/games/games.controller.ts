@@ -46,7 +46,7 @@ export class GamesController {
     description: 'Internal server error',
   })
   getGame(@Param('gameId') gameId: string): Promise<GameEntity> {
-    return this.gamesService.getGame(gameId);
+    return this.gamesService.getGameById(gameId);
   }
 
   @Get(':gameId/publisher')
@@ -62,7 +62,7 @@ export class GamesController {
     description: 'Internal server error',
   })
   getPublisher(@Param('gameId') gameId: string): Promise<PublisherEntity> {
-    return this.gamesService.getPublisher(gameId);
+    return this.gamesService.getGamePublisherByGameId(gameId);
   }
 
   @Post()
@@ -97,7 +97,7 @@ export class GamesController {
     @Param('gameId') gameId: string,
     @Body() body: UpdateGameDto,
   ): Promise<GameEntity> {
-    return this.gamesService.updateGame(gameId, body);
+    return this.gamesService.updateGameById(gameId, body);
   }
 
   @Delete(':gameId')
@@ -113,7 +113,7 @@ export class GamesController {
     description: 'Internal server error',
   })
   deleteGame(@Param('gameId') gameId: string): Promise<GameEntity> {
-    return this.gamesService.deleteGame(gameId);
+    return this.gamesService.deleteGameById(gameId);
   }
 
   @Post('trigger-apply-discount-and-delete-older-games-process')

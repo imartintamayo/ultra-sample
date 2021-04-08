@@ -4,6 +4,7 @@ import { GamesController } from './games.controller';
 import { GamesService } from './games.service';
 import { Game, GameSchema } from '../schemas/game.schema';
 import { Publisher, PublisherSchema } from '../schemas/publisher.schema';
+import { PublishersService } from '../publishers/publishers.service';
 
 @Module({
   imports: [
@@ -13,6 +14,6 @@ import { Publisher, PublisherSchema } from '../schemas/publisher.schema';
     ]),
   ],
   controllers: [GamesController],
-  providers: [GamesService],
+  providers: [GamesService, PublishersService],
 })
 export class GamesModule {}
