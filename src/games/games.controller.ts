@@ -6,6 +6,7 @@ import {
   Delete,
   Param,
   Body,
+  HttpStatus,
 } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -20,9 +21,13 @@ export class GamesController {
   @Get()
   @ApiOperation({ summary: 'List games' })
   @ApiResponse({
-    status: 200,
-    description: 'The list of games',
+    status: HttpStatus.OK,
     type: [GameEntity],
+    description: 'Success',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
   })
   getGames(): Promise<GameEntity[]> {
     return this.gamesService.getGames();
@@ -30,7 +35,16 @@ export class GamesController {
 
   @Get(':gameId')
   @ApiOperation({ summary: 'Find game by gameId' })
-  @ApiResponse({ status: 200, description: 'The found game', type: GameEntity })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    type: GameEntity,
+    description: 'Success',
+  })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Not found' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
   getGame(@Param('gameId') gameId: string): Promise<GameEntity> {
     return this.gamesService.getGame(gameId);
   }
@@ -38,9 +52,14 @@ export class GamesController {
   @Get(':gameId/publisher')
   @ApiOperation({ summary: 'Get game publisher info by gameId' })
   @ApiResponse({
-    status: 200,
-    description: 'The found game publisher info',
+    status: HttpStatus.OK,
     type: PublisherEntity,
+    description: 'Success',
+  })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Not found' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
   })
   getPublisher(@Param('gameId') gameId: string): Promise<PublisherEntity> {
     return this.gamesService.getPublisher(gameId);
@@ -49,9 +68,14 @@ export class GamesController {
   @Post()
   @ApiOperation({ summary: 'Create game' })
   @ApiResponse({
-    status: 201,
-    description: 'The created game',
+    status: HttpStatus.CREATED,
     type: GameEntity,
+    description: 'Success',
+  })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Not found' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
   })
   createGame(@Body() body: CreateGameDto): Promise<GameEntity> {
     return this.gamesService.createGame(body);
@@ -60,9 +84,14 @@ export class GamesController {
   @Put(':gameId')
   @ApiOperation({ summary: 'Update game by gameId' })
   @ApiResponse({
-    status: 200,
-    description: 'The updated game',
+    status: HttpStatus.OK,
     type: GameEntity,
+    description: 'Success',
+  })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Not found' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
   })
   updateGame(
     @Param('gameId') gameId: string,
@@ -74,15 +103,28 @@ export class GamesController {
   @Delete(':gameId')
   @ApiOperation({ summary: 'Delete game by gameId' })
   @ApiResponse({
-    status: 200,
-    description: 'The deleted game',
+    status: HttpStatus.OK,
     type: GameEntity,
+    description: 'Success',
+  })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Not found' })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
   })
   deleteGame(@Param('gameId') gameId: string): Promise<GameEntity> {
     return this.gamesService.deleteGame(gameId);
   }
 
   @Post('trigger-apply-discount-and-delete-older-games-process')
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'Success',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Internal server error',
+  })
   triggerApplyDiscountAndDeleteOlderGamesProcess() {
     return this.gamesService.triggerApplyDiscountAndDeleteOlderGamesProcess();
   }
