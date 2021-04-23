@@ -13,6 +13,8 @@ services:
         - ultra-mongo
     volumes: 
         - .:/usr/src/app
+        - /usr/src/app/dist
+        - /usr/src/app/node_modules
   ultra-mongo:
     container_name: ultra-mongo
     image: mongo
